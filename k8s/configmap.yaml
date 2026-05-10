@@ -1,59 +1,23 @@
-# Kubernetes ConfigMap
-# Environment-agnostic configuration
-
 apiVersion: v1
-kind: ConfigMap
+kind: Namespace
 metadata:
-  name: nextjs-config
-  namespace: plataformas-web
-data:
-  # Next.js public config (exposed to browser)
-  NEXT_PUBLIC_API_URL: "https://api.plataformas.example.com"
-  NEXT_PUBLIC_APP_NAME: "Plataformas Web"
-  NODE_ENV: "production"
-  # Logging
-  LOG_LEVEL: "info"
-  LOG_FORMAT: "json"
+  name: nextjs-template
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: api-config
-  namespace: plataformas-web
+  name: nextjs-template
+  namespace: nextjs-template
 data:
   NODE_ENV: "production"
-  PORT: "4000"
-  # CORS
-  CORS_ORIGIN: "https://app.plataformas.example.com"
-  # Rate limiting
-  RATE_LIMIT_MAX: "100"
-  RATE_LIMIT_WINDOW_MS: "60000"
-  # Meilisearch
-  MEILISEARCH_HOST: "http://meilisearch:7700"
-  # Logging
-  LOG_LEVEL: "info"
-  LOG_FORMAT: "json"
-  # Health check path
-  HEALTH_PATH: "/health"
+  PORT: "3000"
+  npm_package_version: "0.1.0"
 ---
 apiVersion: v1
-kind: ConfigMap
+kind: Secret
 metadata:
-  name: postgres-config
-  namespace: plataformas-web
-data:
-  POSTGRES_DB: "app"
-  # Connection pool settings
-  POSTGRES_MAX_CONNECTIONS: "20"
-  POSTGRES_IDLE_TIMEOUT_MS: "30000"
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: redis-config
-  namespace: plataformas-web
-data:
-  REDIS_DB: "0"
-  # TTL defaults
-  REDIS_CACHE_TTL: "3600"
-  REDIS_SESSION_TTL: "86400"
+  name: nextjs-template
+  namespace: nextjs-template
+type: Opaque
+stringData:
+  DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/nextjs?schema=public"
