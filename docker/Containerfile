@@ -1,0 +1,76 @@
+# syntax=docker/dockerfile:1
+# Multi-stage Dockerfile for Next.js + Fastify monorepo
+# Built for ARM64 + x86_64 (M1 Mac + i7 Mac Mini cluster)
+
+# =============================================================================
+# Stage 1: Dependencies
+# =============================================================================
+FROM node:20-alpine AS deps
+
+# Install build dependencies for native modules
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/cache/apk/*
+
+WORKDIR /app
+
+# Copy package files
+COPY package.json package-lock.json* ./
+
+# Install dependencies (with offline cache for rebuilds)
+RUN npm ci --prefer-offline || npm ci
+
+# =============================================================================
+# Stage 2: Builder
+# =============================================================================
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copy dependencies from deps stage
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# Environment variables for build
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+
+# Build Next.js
+RUN npm run build
+
+# Prisma generate (needed for runtime)
+RUN npx prisma generate
+
+# =============================================================================
+# Stage 3: Runner (Distroless)
+# =============================================================================
+FROM gcr.io/distroless/nodejs20-debian12 AS runner
+
+# Security: non-root user, read-only filesystem
+USER nonroot
+
+WORKDIR /app
+
+# Copy built artifacts
+COPY --from=builder --chown=nonroot:nonroot /app/.next /app/.next
+COPY --from=builder --chown=nonroot:nonroot /app/node_modules /app/node_modules
+COPY --from=builder --chown=nonroot:nonroot /app/package.json /app/package.json
+COPY --from=builder --chown=nonroot:nonroot /app/prisma /app/prisma
+
+# Environment (non-sensitive)
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+# Expose port
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD wget -qO- http://localhost:3000/health || exit 1
+
+# Start command
+CMD ["node_modules/.bin/next", "start"]

@@ -1,0 +1,99 @@
+# Kubernetes Service Manifest
+# ClusterIP services for internal traffic
+
+---
+# Next.js Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: nextjs
+  namespace: plataformas-web
+  labels:
+    app: nextjs
+spec:
+  type: ClusterIP
+  selector:
+    app: nextjs
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+      protocol: TCP
+  # Session affinity for sticky sessions if needed
+  # sessionAffinity: ClientIP
+
+---
+# Fastify API Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastify-api
+  namespace: plataformas-web
+  labels:
+    app: fastify-api
+spec:
+  type: ClusterIP
+  selector:
+    app: fastify-api
+  ports:
+    - name: http
+      port: 4000
+      targetPort: 4000
+      protocol: TCP
+
+---
+# Postgres Service (for jobs/migrations)
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: plataformas-web
+  labels:
+    app: postgres
+spec:
+  type: ClusterIP
+  selector:
+    app: postgres
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+      protocol: TCP
+
+---
+# Redis Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: plataformas-web
+  labels:
+    app: redis
+spec:
+  type: ClusterIP
+  selector:
+    app: redis
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: 6379
+      protocol: TCP
+
+---
+# Meilisearch Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: meilisearch
+  namespace: plataformas-web
+  labels:
+    app: meilisearch
+spec:
+  type: ClusterIP
+  selector:
+    app: meilisearch
+  ports:
+    - name: http
+      port: 7700
+      targetPort: 7700
+      protocol: TCP
