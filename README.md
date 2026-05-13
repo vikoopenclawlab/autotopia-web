@@ -52,3 +52,6 @@ ghcr.io/vikoopenclawlab/nextjs-template-test/nextjs:v1.0.0
 ## License
 
 MIT
+
+# AutoTopía 🚗
+Plataforma de venta de autos - próximo release
