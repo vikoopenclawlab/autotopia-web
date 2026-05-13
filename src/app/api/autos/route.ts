@@ -8,7 +8,14 @@ export async function GET() {
     })
     return NextResponse.json(autos)
   } catch (error) {
-    return NextResponse.json({ error: 'Error fetching autos' }, { status: 500 })
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.error('DB Error in GET /api/autos:', errorMessage)
+    return NextResponse.json({ 
+      error: 'Database connection failed', 
+      detail: errorMessage,
+      code: (error as any)?.code,
+      severity: (error as any)?.severity
+    }, { status: 500 })
   }
 }
 
@@ -41,6 +48,8 @@ export async function POST(request: Request) {
     })
     return NextResponse.json(auto)
   } catch (error) {
-    return NextResponse.json({ error: 'Error creating auto' }, { status: 500 })
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.error('DB Error in POST /api/autos:', errorMessage)
+    return NextResponse.json({ error: 'Error creating auto', detail: errorMessage }, { status: 500 })
   }
 }
