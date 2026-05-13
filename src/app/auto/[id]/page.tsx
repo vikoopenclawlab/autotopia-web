@@ -7,8 +7,8 @@ import { autosEjemplo } from '@/lib/data'
 
 export default function AutoDetalle() {
   const params = useParams()
-  const id = params.id as string
-  const auto = autosEjemplo.find(a => a.id === id)
+  const id = params?.id as string | undefined
+  const auto = id ? autosEjemplo.find(a => a.id === id) : undefined
   const [imagenActual, setImagenActual] = useState(0)
 
   const formatPrice = (price: number) =>
