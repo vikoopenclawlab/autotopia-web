@@ -25,23 +25,23 @@ enum Role {
 
 // Autos en venta
 model Auto {
-  id          String   @id @default(cuid())
-  titulo      String
-  marca       String
-  modelo      String
-  año         Int
-  precio      Decimal  @db.Decimal(12, 2)
-  kilometros  Int
-  color       String
-  transmision String
-  combustible String
-  descripcion String   @db.Text
-  imagenes    String[] // URLs de imágenes
-  caracteristicas String[] // lista de características
-  disponibles Boolean  @default(true)
-  destacado   Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String   @id @default(cuid())
+  titulo       String
+  marca        String
+  modelo       String
+  anio         Int
+  precio       Float
+  kilometros   Int
+  color        String
+  transmision  String
+  combustible  String
+  descripcion  String
+  imagenes     String[]
+  caracteristicas String[]
+  disponibles  Boolean  @default(true)
+  destacado    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 // Contactos/leads del formulario
@@ -50,17 +50,17 @@ model Contacto {
   nombre    String
   email     String
   telefono  String?
-  mensaje   String   @db.Text
+  mensaje   String
   leido     Boolean  @default(false)
   createdAt DateTime @default(now())
 }
 
 // Configuraciones generales
 model Configuracion {
-  id    String @id @default("global")
-  telefono String?
-  email    String?
+  id        String   @id @default("global")
+  telefono  String?
+  email     String?
   direccion String?
-  horario  String?
+  horario   String?
   updatedAt DateTime @updatedAt
 }
