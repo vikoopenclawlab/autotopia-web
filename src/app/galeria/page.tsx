@@ -1,17 +1,46 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { autosEjemplo, marcas } from '@/lib/data'
+
+interface Auto {
+  id: string
+  titulo: string
+  marca: string
+  modelo: string
+  anio: number
+  precio: number
+  kilometros: number
+  color: string
+  transmision: string
+  combustible: string
+  descripcion: string
+  imagenes: string[]
+  caracteristicas: string[]
+  disponibles: boolean
+  destacado: boolean
+}
 
 export default function Galeria() {
+  const [autos, setAutos] = useState<Auto[]>([])
   const [filtroMarca, setFiltroMarca] = useState<string>('')
   const [ordenarPor, setOrdenarPor] = useState<string>('destacado')
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch('/api/autos')
+      .then(res => res.json())
+      .then(data => setAutos(data))
+      .catch(() => setAutos([]))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const marcas = [...new Set(autos.map(a => a.marca))].sort()
 
   const formatPrice = (price: number) =>
     new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 }).format(price)
 
-  const autosFiltrados = autosEjemplo
+  const autosFiltrados = autos
     .filter(auto => !filtroMarca || auto.marca === filtroMarca)
     .sort((a, b) => {
       if (ordenarPor === 'destacado') return b.destacado ? 1 : -1
@@ -132,150 +161,160 @@ export default function Galeria() {
         maxWidth: '1200px',
         margin: '0 auto',
       }}>
-        <p style={{
-          color: 'rgba(255,255,255,0.5)',
-          marginBottom: '2rem',
-          fontSize: '0.9rem',
-        }}>
-          {autosFiltrados.length} vehículos disponibles
-        </p>
+        {loading ? (
+          <p style={{ color: 'rgba(255,255,255,0.5)', textAlign: 'center', padding: '4rem' }}>Cargando...</p>
+        ) : (
+          <>
+            <p style={{
+              color: 'rgba(255,255,255,0.5)',
+              marginBottom: '2rem',
+              fontSize: '0.9rem',
+            }}>
+              {autosFiltrados.length} vehículos disponibles
+            </p>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-          gap: '2rem',
-        }}>
-          {autosFiltrados.map(auto => (
-            <Link
-              key={auto.id}
-              href={`/auto/${auto.id}`}
-              style={{
-                background: 'linear-gradient(135deg, #1a1a2e 0%, #16162a 100%)',
-                borderRadius: '16px',
-                overflow: 'hidden',
-                textDecoration: 'none',
-                color: 'inherit',
-                border: '1px solid rgba(255,255,255,0.1)',
-                transition: 'transform 0.3s, box-shadow 0.3s',
-                display: 'block',
-              }}
-            >
-              <div style={{ position: 'relative', height: '200px', overflow: 'hidden' }}>
-                <img
-                  src={auto.imagenes[0]}
-                  alt={auto.titulo}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+              gap: '2rem',
+            }}>
+              {autosFiltrados.map(auto => (
+                <Link
+                  key={auto.id}
+                  href={`/auto/${auto.id}`}
                   style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    transition: 'transform 0.3s',
+                    background: 'linear-gradient(135deg, #1a1a2e 0%, #16162a 100%)',
+                    borderRadius: '16px',
+                    overflow: 'hidden',
+                    textDecoration: 'none',
+                    color: 'inherit',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    transition: 'transform 0.3s, box-shadow 0.3s',
+                    display: 'block',
                   }}
-                />
-                {auto.destacado && (
-                  <div style={{
-                    position: 'absolute',
-                    top: '1rem',
-                    left: '1rem',
-                    background: '#00ff88',
+                >
+                  <div style={{ position: 'relative', height: '200px', overflow: 'hidden', background: '#1a1a2e' }}>
+                    {auto.imagenes && auto.imagenes[0] ? (
+                      <img
+                        src={auto.imagenes[0]}
+                        alt={auto.titulo}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          transition: 'transform 0.3s',
+                        }}
+                      />
+                    ) : (
+                      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem' }}>🚗</div>
+                    )}
+                    {auto.destacado && (
+                      <div style={{
+                        position: 'absolute',
+                        top: '1rem',
+                        left: '1rem',
+                        background: '#00ff88',
+                        color: '#0a0a14',
+                        padding: '0.3rem 0.8rem',
+                        borderRadius: '20px',
+                        fontSize: '0.75rem',
+                        fontWeight: 'bold',
+                      }}>
+                        DESTACADO
+                      </div>
+                    )}
+                    <div style={{
+                      position: 'absolute',
+                      bottom: '0',
+                      left: 0,
+                      right: 0,
+                      background: 'linear-gradient(transparent, rgba(0,0,0,0.8))',
+                      padding: '1rem',
+                    }}>
+                      <span style={{
+                        background: 'rgba(255,255,255,0.2)',
+                        padding: '0.2rem 0.6rem',
+                        borderRadius: '4px',
+                        fontSize: '0.75rem',
+                      }}>
+                        {auto.marca}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div style={{ padding: '1.5rem' }}>
+                    <h3 style={{
+                      fontSize: '1.1rem',
+                      fontWeight: 600,
+                      marginBottom: '0.5rem',
+                    }}>
+                      {auto.titulo}
+                    </h3>
+
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(2, 1fr)',
+                      gap: '0.5rem',
+                      marginBottom: '1rem',
+                      fontSize: '0.85rem',
+                      color: 'rgba(255,255,255,0.5)',
+                    }}>
+                      <span>📅 {auto.anio}</span>
+                      <span>⌛ {auto.kilometros.toLocaleString('es-MX')} km</span>
+                      <span>⚙️ {auto.transmision}</span>
+                      <span>⛽ {auto.combustible}</span>
+                    </div>
+
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}>
+                      <div style={{
+                        fontSize: '1.3rem',
+                        fontWeight: 700,
+                        color: '#00d9ff',
+                      }}>
+                        {formatPrice(auto.precio)}
+                      </div>
+                      <span style={{
+                        color: 'rgba(255,255,255,0.5)',
+                        fontSize: '0.85rem',
+                      }}>
+                        Ver más →
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            {autosFiltrados.length === 0 && (
+              <div style={{
+                textAlign: 'center',
+                padding: '4rem 2rem',
+                color: 'rgba(255,255,255,0.5)',
+              }}>
+                <p style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔍</p>
+                <p>No hay autos que coincidan con el filtro</p>
+                <button
+                  onClick={() => setFiltroMarca('')}
+                  style={{
+                    marginTop: '1rem',
+                    padding: '0.75rem 1.5rem',
+                    background: 'linear-gradient(90deg, #00d9ff, #00ff88)',
+                    border: 'none',
+                    borderRadius: '8px',
                     color: '#0a0a14',
-                    padding: '0.3rem 0.8rem',
-                    borderRadius: '20px',
-                    fontSize: '0.75rem',
                     fontWeight: 'bold',
-                  }}>
-                    DESTACADO
-                  </div>
-                )}
-                <div style={{
-                  position: 'absolute',
-                  bottom: '0',
-                  left: 0,
-                  right: 0,
-                  background: 'linear-gradient(transparent, rgba(0,0,0,0.8))',
-                  padding: '1rem',
-                }}>
-                  <span style={{
-                    background: 'rgba(255,255,255,0.2)',
-                    padding: '0.2rem 0.6rem',
-                    borderRadius: '4px',
-                    fontSize: '0.75rem',
-                  }}>
-                    {auto.marca}
-                  </span>
-                </div>
+                    cursor: 'pointer',
+                  }}
+                >
+                  Limpiar filtros
+                </button>
               </div>
-
-              <div style={{ padding: '1.5rem' }}>
-                <h3 style={{
-                  fontSize: '1.1rem',
-                  fontWeight: 600,
-                  marginBottom: '0.5rem',
-                }}>
-                  {auto.titulo}
-                </h3>
-
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(2, 1fr)',
-                  gap: '0.5rem',
-                  marginBottom: '1rem',
-                  fontSize: '0.85rem',
-                  color: 'rgba(255,255,255,0.5)',
-                }}>
-                  <span>📅 {auto.anio}</span>
-                  <span>⌛ {auto.kilometros.toLocaleString('es-MX')} km</span>
-                  <span>⚙️ {auto.transmision}</span>
-                  <span>⛽ {auto.combustible}</span>
-                </div>
-
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
-                  <div style={{
-                    fontSize: '1.3rem',
-                    fontWeight: 700,
-                    color: '#00d9ff',
-                  }}>
-                    {formatPrice(auto.precio)}
-                  </div>
-                  <span style={{
-                    color: 'rgba(255,255,255,0.5)',
-                    fontSize: '0.85rem',
-                  }}>
-                    Ver más →
-                  </span>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        {autosFiltrados.length === 0 && (
-          <div style={{
-            textAlign: 'center',
-            padding: '4rem 2rem',
-            color: 'rgba(255,255,255,0.5)',
-          }}>
-            <p style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔍</p>
-            <p>No hay autos que coincidan con el filtro</p>
-            <button
-              onClick={() => setFiltroMarca('')}
-              style={{
-                marginTop: '1rem',
-                padding: '0.75rem 1.5rem',
-                background: 'linear-gradient(90deg, #00d9ff, #00ff88)',
-                border: 'none',
-                borderRadius: '8px',
-                color: '#0a0a14',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-              }}
-            >
-              Limpiar filtros
-            </button>
-          </div>
+            )}
+          </>
         )}
       </section>
     </div>

@@ -28,13 +28,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Credenciales inválidas' }, { status: 401 })
     }
 
-    // Guardar sesión en cookie
+    // Guardar sesión en cookie (5 minutos)
     const cookieStore = await cookies()
     cookieStore.set('session', email, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 60 * 60 * 24, // 24 horas
+      maxAge: 60 * 5, // 5 minutos
       path: '/',
     })
 

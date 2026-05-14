@@ -146,10 +146,11 @@ export default function Contacto() {
                     </label>
                     <input
                       type="tel"
-                      pattern="[0-9\s()+ -]{10,20}"
-                      title="Número de teléfono válido"
+                      pattern="[0-9]{10}"
+                      title="Número de teléfono mexicano a 10 dígitos"
+                      maxLength={10}
                       value={formData.telefono}
-                      onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
+                      onChange={(e) => setFormData({ ...formData, telefono: e.target.value.replace(/\D/g, '').slice(0, 10) })}
                       style={{
                         width: '100%',
                         padding: '0.9rem 1rem',

@@ -233,12 +233,16 @@ export default function Admin() {
           </Link>
         </div>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem' }}>Sesión: 5 min</span>
           <Link
             href="/"
             style={{
-              color: 'rgba(255,255,255,0.7)',
+              background: 'rgba(255,255,255,0.1)',
+              color: 'white',
               textDecoration: 'none',
-              fontSize: '0.9rem',
+              padding: '0.5rem 1rem',
+              borderRadius: '8px',
+              fontSize: '0.85rem',
             }}
           >
             ← Ver sitio
@@ -248,14 +252,15 @@ export default function Admin() {
             style={{
               background: 'rgba(255,59,48,0.2)',
               color: '#ff3b30',
-              border: 'none',
+              border: '1px solid rgba(255,59,48,0.3)',
               padding: '0.5rem 1rem',
               borderRadius: '8px',
               cursor: 'pointer',
               fontSize: '0.85rem',
+              fontWeight: 600,
             }}
           >
-            Cerrar sesión
+            🔒 Cerrar sesión
           </button>
         </div>
       </div>
