@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import crypto from 'crypto'
 import { prisma } from '@/lib/prisma'
 
@@ -26,6 +27,16 @@ export async function POST(request: Request) {
     if (!passwordValid) {
       return NextResponse.json({ error: 'Credenciales inválidas' }, { status: 401 })
     }
+
+    // Guardar sesión en cookie
+    const cookieStore = await cookies()
+    cookieStore.set('session', email, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24, // 24 horas
+      path: '/',
+    })
 
     return NextResponse.json({
       id: user.id,

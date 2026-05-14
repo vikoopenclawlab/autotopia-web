@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import Link from 'next/link'
 
 interface Auto {
   id: string
@@ -20,11 +21,30 @@ interface Auto {
 
 export default function Admin() {
   const [loggedIn, setLoggedIn] = useState(false)
+  const [checkingSession, setCheckingSession] = useState(true)
   const [loginForm, setLoginForm] = useState({ email: '', password: '' })
   const [activeTab, setActiveTab] = useState('autos')
   const [autos, setAutos] = useState<Auto[]>([])
   const [loading, setLoading] = useState(false)
-  const [editAuto, setEditAuto] = useState<Auto | null>(null)
+
+  const checkSession = useCallback(async () => {
+    try {
+      const res = await fetch('/api/auth/session')
+      if (res.ok) {
+        const data = await res.json()
+        if (data.email) {
+          setLoggedIn(true)
+        }
+      }
+    } catch {
+      // Not logged in
+    }
+    setCheckingSession(false)
+  }, [])
+
+  useEffect(() => {
+    checkSession()
+  }, [checkSession])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -33,6 +53,7 @@ export default function Admin() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(loginForm),
+        credentials: 'include',
       })
       if (res.ok) {
         setLoggedIn(true)
@@ -43,6 +64,16 @@ export default function Admin() {
     } catch {
       alert('Error de conexión')
     }
+  }
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
+    } catch {
+      // Ignore
+    }
+    setLoggedIn(false)
+    setLoginForm({ email: '', password: '' })
   }
 
   const fetchAutos = async () => {
@@ -67,8 +98,28 @@ export default function Admin() {
     }
   }
 
+  useEffect(() => {
+    if (loggedIn) {
+      fetchAutos()
+    }
+  }, [loggedIn])
+
   const formatPrice = (price: number) =>
     new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 }).format(price)
+
+  if (checkingSession) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#0a0a14',
+      }}>
+        <p style={{ color: 'rgba(255,255,255,0.5)' }}>Cargando...</p>
+      </div>
+    )
+  }
 
   if (!loggedIn) {
     return (
@@ -166,7 +217,7 @@ export default function Admin() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#0a0a14' }}>
-      {/* Admin Header */}
+      {/* Admin Header - sin Navbar ni Footer */}
       <div style={{
         background: 'linear-gradient(135deg, #1a1a2e 0%, #16162a 100%)',
         borderBottom: '1px solid rgba(255,255,255,0.1)',
@@ -176,23 +227,37 @@ export default function Admin() {
         alignItems: 'center',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <span style={{ fontSize: '1.5rem' }}>🚗</span>
-          <span style={{ fontWeight: 600 }}>AutoTopía Admin</span>
+          <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <span style={{ fontSize: '1.5rem' }}>🚗</span>
+            <span style={{ fontWeight: 600, color: 'white' }}>AutoTopía Admin</span>
+          </Link>
         </div>
-        <button
-          onClick={() => setLoggedIn(false)}
-          style={{
-            background: 'rgba(255,255,255,0.1)',
-            color: 'white',
-            border: 'none',
-            padding: '0.5rem 1rem',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            fontSize: '0.85rem',
-          }}
-        >
-          Cerrar sesión
-        </button>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <Link
+            href="/"
+            style={{
+              color: 'rgba(255,255,255,0.7)',
+              textDecoration: 'none',
+              fontSize: '0.9rem',
+            }}
+          >
+            ← Ver sitio
+          </Link>
+          <button
+            onClick={handleLogout}
+            style={{
+              background: 'rgba(255,59,48,0.2)',
+              color: '#ff3b30',
+              border: 'none',
+              padding: '0.5rem 1rem',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontSize: '0.85rem',
+            }}
+          >
+            Cerrar sesión
+          </button>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -231,7 +296,7 @@ export default function Admin() {
               <h2 style={{ fontSize: '1.5rem', fontWeight: 600 }}>
                 Gestión de Autos
               </h2>
-              <a
+              <Link
                 href="/admin/nuevo"
                 style={{
                   background: 'linear-gradient(90deg, #00d9ff, #00ff88)',
@@ -243,7 +308,7 @@ export default function Admin() {
                 }}
               >
                 + Agregar auto
-              </a>
+              </Link>
             </div>
 
             {loading ? (
@@ -281,7 +346,7 @@ export default function Admin() {
                           </span>
                         </td>
                         <td style={{ padding: '1rem', textAlign: 'right' }}>
-                          <a
+                          <Link
                             href={`/admin/editar/${auto.id}`}
                             style={{
                               background: 'rgba(0,217,255,0.2)',
@@ -296,7 +361,7 @@ export default function Admin() {
                             }}
                           >
                             Editar
-                          </a>
+                          </Link>
                           <button
                             onClick={() => deleteAuto(auto.id)}
                             style={{

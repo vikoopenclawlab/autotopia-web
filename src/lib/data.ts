@@ -179,7 +179,7 @@ export const autosEjemplo: Auto[] = [
     descripcion: 'Hyundai Tucson Limited Híbrido 2023. Diseño parametric jewel exterior, pantalla panorámica de 10.25", sistema de sonido premium Bose, asistencia de manejo highway driving, climatizador automático bi-zona.',
     imagenes: [
       'https://images.unsplash.com/photo-1619682817481-e9947cd2aff4?w=800',
-      'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800',
+      'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800',
     ],
     caracteristicas: [
       'Diseño Parametric Jewel',

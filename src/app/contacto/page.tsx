@@ -85,6 +85,10 @@ export default function Contacto() {
                     <input
                       type="text"
                       required
+                      minLength={3}
+                      maxLength={100}
+                      pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$"
+                      title="Solo letras y espacios"
                       value={formData.nombre}
                       onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
                       style={{
@@ -114,6 +118,7 @@ export default function Contacto() {
                     <input
                       type="email"
                       required
+                      pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       style={{
@@ -141,6 +146,8 @@ export default function Contacto() {
                     </label>
                     <input
                       type="tel"
+                      pattern="[0-9\s()+ -]{10,20}"
+                      title="Número de teléfono válido"
                       value={formData.telefono}
                       onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
                       style={{
@@ -168,6 +175,8 @@ export default function Contacto() {
                     </label>
                     <textarea
                       required
+                      minLength={10}
+                      maxLength={1000}
                       value={formData.mensaje}
                       onChange={(e) => setFormData({ ...formData, mensaje: e.target.value })}
                       rows={4}
