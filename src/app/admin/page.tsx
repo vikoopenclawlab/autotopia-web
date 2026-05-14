@@ -26,6 +26,8 @@ export default function Admin() {
   const [activeTab, setActiveTab] = useState('autos')
   const [autos, setAutos] = useState<Auto[]>([])
   const [loading, setLoading] = useState(false)
+  const [stats, setStats] = useState({ autos: 0, contactos: 0, sinLeer: 0 })
+  const [contactos, setContactos] = useState<any[]>([])
 
   const checkSession = useCallback(async () => {
     try {
@@ -101,8 +103,28 @@ export default function Admin() {
   useEffect(() => {
     if (loggedIn) {
       fetchAutos()
+      fetchStats()
     }
   }, [loggedIn])
+
+  const fetchStats = async () => {
+    try {
+      const [autosRes, contactosRes] = await Promise.all([
+        fetch('/api/autos'),
+        fetch('/api/contacto'),
+      ])
+      const autosData = await autosRes.json()
+      const contactosData = await contactosRes.json()
+      setStats({
+        autos: Array.isArray(autosData) ? autosData.length : 0,
+        contactos: contactosData.total || 0,
+        sinLeer: contactosData.sin_leer || 0,
+      })
+      setContactos(contactosData.contactos || [])
+    } catch (error) {
+      console.error('Error fetching stats:', error)
+    }
+  }
 
   const formatPrice = (price: number) =>
     new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 }).format(price)
@@ -286,6 +308,36 @@ export default function Admin() {
         >
           🚗 Autos ({autos.length})
         </button>
+        <button
+          onClick={() => setActiveTab('dashboard')}
+          style={{
+            padding: '1rem 1.5rem',
+            background: 'none',
+            border: 'none',
+            color: activeTab === 'dashboard' ? '#00d9ff' : 'rgba(255,255,255,0.5)',
+            borderBottom: activeTab === 'dashboard' ? '2px solid #00d9ff' : '2px solid transparent',
+            cursor: 'pointer',
+            fontSize: '0.9rem',
+            fontWeight: 500,
+          }}
+        >
+          📊 Dashboard
+        </button>
+        <button
+          onClick={() => setActiveTab('contactos')}
+          style={{
+            padding: '1rem 1.5rem',
+            background: 'none',
+            border: 'none',
+            color: activeTab === 'contactos' ? '#00d9ff' : 'rgba(255,255,255,0.5)',
+            borderBottom: activeTab === 'contactos' ? '2px solid #00d9ff' : '2px solid transparent',
+            cursor: 'pointer',
+            fontSize: '0.9rem',
+            fontWeight: 500,
+          }}
+        >
+          📧 Contactos
+        </button>
       </div>
 
       {/* Content */}
@@ -393,6 +445,52 @@ export default function Admin() {
                     )}
                   </tbody>
                 </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'dashboard' && (
+          <div>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '2rem' }}>📊 Dashboard</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
+              <div style={{ background: 'linear-gradient(135deg, #1a1a2e 0%, #16162a 100%)', borderRadius: '16px', padding: '2rem', border: '1px solid rgba(255,255,255,0.1)' }}>
+                <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🚗</div>
+                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#00d9ff' }}>{stats.autos}</div>
+                <div style={{ color: 'rgba(255,255,255,0.5)' }}>Autos en inventario</div>
+              </div>
+              <div style={{ background: 'linear-gradient(135deg, #1a1a2e 0%, #16162a 100%)', borderRadius: '16px', padding: '2rem', border: '1px solid rgba(255,255,255,0.1)' }}>
+                <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>📧</div>
+                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#00ff88' }}>{stats.contactos}</div>
+                <div style={{ color: 'rgba(255,255,255,0.5)' }}>Total contactos</div>
+              </div>
+              <div style={{ background: 'linear-gradient(135deg, #1a1a2e 0%, #16162a 100%)', borderRadius: '16px', padding: '2rem', border: '1px solid rgba(255,255,255,0.1)' }}>
+                <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>✉️</div>
+                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#ffcc00' }}>{stats.sinLeer}</div>
+                <div style={{ color: 'rgba(255,255,255,0.5)' }}>Mensajes sin leer</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'contactos' && (
+          <div>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '2rem' }}>📧 Contactos</h2>
+            {contactos.length === 0 ? (
+              <p style={{ color: 'rgba(255,255,255,0.5)' }}>No hay mensajes</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {contactos.map((c) => (
+                  <div key={c.id} style={{ background: 'linear-gradient(135deg, #1a1a2e 0%, #16162a 100%)', borderRadius: '12px', padding: '1.5rem', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                      <strong style={{ color: '#00d9ff' }}>{c.nombre}</strong>
+                      <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>{new Date(c.createdAt).toLocaleString('es-MX')}</span>
+                    </div>
+                    <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', marginBottom: '0.5rem' }}>{c.email}</div>
+                    {c.telefono && <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem', marginBottom: '0.5rem' }}>📱 {c.telefono}</div>}
+                    <p style={{ color: 'white', lineHeight: 1.5 }}>{c.mensaje}</p>
+                  </div>
+                ))}
               </div>
             )}
           </div>

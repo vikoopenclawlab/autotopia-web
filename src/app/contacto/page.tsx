@@ -10,11 +10,26 @@ export default function Contacto() {
     mensaje: '',
   })
   const [submitted, setSubmitted] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Simular envío
-    setSubmitted(true)
+    setLoading(true)
+    try {
+      const res = await fetch('/api/contacto', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+      if (res.ok) {
+        setSubmitted(true)
+      } else {
+        alert('Error al enviar mensaje')
+      }
+    } catch {
+      alert('Error de conexión')
+    }
+    setLoading(false)
   }
 
   return (
@@ -199,19 +214,20 @@ export default function Contacto() {
 
                   <button
                     type="submit"
+                    disabled={loading}
                     style={{
-                      background: 'linear-gradient(90deg, #00d9ff, #00ff88)',
+                      background: loading ? 'rgba(0,217,255,0.5)' : 'linear-gradient(90deg, #00d9ff, #00ff88)',
                       color: '#0a0a14',
                       border: 'none',
                       padding: '1rem',
                       borderRadius: '10px',
                       fontWeight: 'bold',
                       fontSize: '1.1rem',
-                      cursor: 'pointer',
+                      cursor: loading ? 'not-allowed' : 'pointer',
                       transition: 'transform 0.2s',
                     }}
                   >
-                    Enviar mensaje →
+                    {loading ? 'Enviando...' : 'Enviar mensaje →'}
                   </button>
                 </form>
               </>

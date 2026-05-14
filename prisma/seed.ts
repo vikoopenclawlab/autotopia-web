@@ -1,13 +1,17 @@
 import { PrismaClient } from '@prisma/client'
-import bcrypt from 'bcrypt'
+import crypto from 'crypto'
 
 const prisma = new PrismaClient()
+
+function simpleHash(password: string): string {
+  return crypto.createHash('sha256').update(password).digest('hex')
+}
 
 async function main() {
   console.log('🌱 Starting seed...')
 
   // Admin user
-  const hashedPassword = await bcrypt.hash('admin123', 10)
+  const hashedPassword = simpleHash('admin123')
   const user = await prisma.user.upsert({
     where: { email: 'admin@autotopia.mx' },
     update: {},
