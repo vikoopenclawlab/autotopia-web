@@ -173,10 +173,10 @@ export default function Galeria() {
               {autosFiltrados.length} vehículos disponibles
             </p>
 
-            <div style={{
+            <div className="auto-grid" style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-              gap: '2rem',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+              gap: '1.5rem',
             }}>
               {autosFiltrados.map(auto => (
                 <Link
