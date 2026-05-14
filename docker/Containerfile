@@ -24,6 +24,9 @@ ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
+# Install OpenSSL 1.1 for Prisma (Alpine doesn't have it by default)
+RUN apk add --no-cache openssl1.1
+
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/prisma ./prisma
