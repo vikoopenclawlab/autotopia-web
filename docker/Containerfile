@@ -20,10 +20,7 @@ FROM base AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    && rm -rf /var/lib/apt/lists/* \
-    && addgroup --system --gid 1001 nodejs \
-    && adduser --system --uid 1001 nextjs
+RUN apt-get update && apt-get install -y --no-install-recommends openssl && rm -rf /var/lib/apt/lists/* && addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nextjs
 
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
