@@ -83,4 +83,13 @@ a {
   .btn-primary {
     width: 100%;
   }
+
+  /* Admin autos grid - single column on mobile */
+  .autos-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .auto-card {
+    padding: 0.75rem !important;
+  }
 }

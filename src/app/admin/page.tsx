@@ -373,80 +373,80 @@ export default function Admin() {
             {loading ? (
               <p style={{ color: 'rgba(255,255,255,0.5)' }}>Cargando...</p>
             ) : (
-              <div style={{
-                background: 'linear-gradient(135deg, #1a1a2e 0%, #16162a 100%)',
-                borderRadius: '16px',
-                border: '1px solid rgba(255,255,255,0.1)',
-                overflow: 'hidden',
+              <div className="autos-grid" style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                gap: '1rem',
               }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                  <thead>
-                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                      <th style={{ padding: '1rem', textAlign: 'left', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Auto</th>
-                      <th style={{ padding: '1rem', textAlign: 'left', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Precio</th>
-                      <th style={{ padding: '1rem', textAlign: 'left', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Status</th>
-                      <th style={{ padding: '1rem', textAlign: 'right', color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {autos.map((auto) => (
-                      <tr key={auto.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                        <td style={{ padding: '1rem', color: 'white' }}>{auto.titulo}</td>
-                        <td style={{ padding: '1rem', color: '#00d9ff' }}>{formatPrice(auto.precio)}</td>
-                        <td style={{ padding: '1rem' }}>
-                          <span style={{
-                            background: auto.destacado ? 'rgba(0,255,136,0.2)' : 'rgba(255,255,255,0.1)',
-                            color: auto.destacado ? '#00ff88' : 'rgba(255,255,255,0.5)',
-                            padding: '0.25rem 0.75rem',
-                            borderRadius: '20px',
-                            fontSize: '0.8rem',
-                          }}>
-                            {auto.destacado ? '⭐ Destacado' : 'Normal'}
-                          </span>
-                        </td>
-                        <td style={{ padding: '1rem', textAlign: 'right' }}>
-                          <Link
-                            href={`/admin/editar/${auto.id}`}
-                            style={{
-                              background: 'rgba(0,217,255,0.2)',
-                              color: '#00d9ff',
-                              border: 'none',
-                              padding: '0.4rem 0.8rem',
-                              borderRadius: '6px',
-                              cursor: 'pointer',
-                              fontSize: '0.85rem',
-                              marginRight: '0.5rem',
-                              textDecoration: 'none',
-                            }}
-                          >
-                            Editar
-                          </Link>
-                          <button
-                            onClick={() => deleteAuto(auto.id)}
-                            style={{
-                              background: 'rgba(255,59,48,0.2)',
-                              color: '#ff3b30',
-                              border: 'none',
-                              padding: '0.4rem 0.8rem',
-                              borderRadius: '6px',
-                              cursor: 'pointer',
-                              fontSize: '0.85rem',
-                            }}
-                          >
-                            Eliminar
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                    {autos.length === 0 && (
-                      <tr>
-                        <td colSpan={4} style={{ padding: '2rem', textAlign: 'center', color: 'rgba(255,255,255,0.5)' }}>
-                          No hay autos. ¡Agrega el primero!
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+                {autos.map((auto) => (
+                  <div key={auto.id} className="auto-card" style={{
+                    background: 'linear-gradient(135deg, #1a1a2e 0%, #16162a 100%)',
+                    borderRadius: '12px',
+                    padding: '1rem',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.75rem',
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem' }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ color: 'white', fontWeight: 500, fontSize: '0.95rem', lineHeight: 1.3 }}>{auto.titulo}</div>
+                        <div style={{ color: '#00d9ff', fontSize: '0.9rem', marginTop: '0.25rem' }}>{formatPrice(auto.precio)}</div>
+                      </div>
+                      <span style={{
+                        background: auto.destacado ? 'rgba(0,255,136,0.2)' : 'rgba(255,255,255,0.1)',
+                        color: auto.destacado ? '#00ff88' : 'rgba(255,255,255,0.5)',
+                        padding: '0.2rem 0.6rem',
+                        borderRadius: '20px',
+                        fontSize: '0.7rem',
+                        whiteSpace: 'nowrap',
+                      }}>
+                        {auto.destacado ? '⭐ Destacado' : 'Normal'}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                      <Link
+                        href={`/admin/editar/${auto.id}`}
+                        style={{
+                          flex: '1',
+                          background: 'rgba(0,217,255,0.2)',
+                          color: '#00d9ff',
+                          border: 'none',
+                          padding: '0.5rem',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          fontSize: '0.8rem',
+                          textAlign: 'center',
+                          textDecoration: 'none',
+                          fontWeight: 600,
+                        }}
+                      >
+                        ✏️ Editar
+                      </Link>
+                      <button
+                        onClick={() => deleteAuto(auto.id)}
+                        style={{
+                          flex: '1',
+                          background: 'rgba(255,59,48,0.2)',
+                          color: '#ff3b30',
+                          border: 'none',
+                          padding: '0.5rem',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          fontSize: '0.8rem',
+                          fontWeight: 600,
+                        }}
+                      >
+                        🗑️ Eliminar
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {autos.length === 0 && (
+                  <div style={{ gridColumn: '1/-1', padding: '2rem', textAlign: 'center', color: 'rgba(255,255,255,0.5)' }}>
+                    No hay autos. ¡Agrega el primero!
+                  </div>
+                )}
               </div>
             )}
           </div>
